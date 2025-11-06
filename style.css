@@ -1,0 +1,459 @@
+/* --- CSS 变量定义 --- */
+:root {
+    --primary-color: #4a69ff; /* 备用色 */
+    --background-color: #f0f2f5; /* 纯色回退背景 */
+    --text-color: #333333;
+    --text-secondary-color: #6c757d;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --font-family:  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    
+    /* 动效切换 */
+    --transition-speed: 0.3s;
+
+    /* 卡片背景变量 - 默认 (不透明) 回退 */
+    --card-bg: #ffffff;
+    --back-bg: #6c757d; /* L2 标题悬停/返回的背景 */
+    --back-hover-bg: #333333;
+}
+
+/* 如果支持毛玻璃效果，则覆盖变量为半透明 */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+    :root {
+        --card-bg: rgba(255, 255, 255, 0.75);
+        --back-bg: rgba(108, 117, 125, 0.8);
+        --back-hover-bg: rgba(51, 51, 51, 0.9);
+    }
+}
+
+
+/* --- 全局样式 --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 1.8vmin;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-color);
+    line-height: 1.6;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    transition: background-color var(--transition-speed) ease;
+
+    background-color: var(--background-color); 
+    background-image: url('pic/sunrise-1030591_1920.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* --- (新) 加载动画 --- */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* * 过渡效果: 
+     * - opacity: 淡出效果
+     * - visibility: 确保淡出后元素不可见也不可交互
+     */
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    visibility: visible;
+    opacity: 1;
+    /* 确保加载页在主页背景图之上，且不可滚动 */
+    overflow: hidden;
+}
+
+.preloader-content {
+    position: relative;
+    /* 使用 vmin 来响应式缩放, 15vmin 意味着 15% 的
+       视口宽度或高度中的较小者 */
+    width: 15vmin; 
+    height: 15vmin;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preloader-logo {
+    width: 60%; /* Logo 占内容的 60% */
+    height: 60%;
+    object-fit: contain;
+    border-radius: 0.5rem; /* 与主页 Logo 保持一致 */
+}
+
+.preloader-spinner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    /* * spinner 边框:
+     * - 0.8vmin: 边框粗细也随窗口缩放
+     * - rgba(0, 0, 0, 0.1): 浅色底圈
+     */
+    border: 0.8vmin solid rgba(0, 0, 0, 0.1); 
+    /* 旋转的颜色 (使用 CSS 变量) */
+    border-top-color: var(--primary-color, #4a69ff); 
+    animation: spin 1s linear infinite;
+}
+
+/* (新) 隐藏加载动画的类 (由 JS 添加) */
+.preloader-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* 确保隐藏后不可点击 */
+}
+
+/* (新) 旋转动画 */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+/* --- 结束 加载动画 --- */
+
+
+.container {
+    height: 100%;
+    width: 100%;
+    padding: 2rem 1rem; 
+    display: flex;
+    flex-direction: column;
+}
+
+/* (已修改) 头部样式调整，支持 Logo 和标题居中 */
+.hub-header {
+    flex-shrink: 0;
+    text-align: center; 
+    margin-bottom: 1.5rem;
+    transition: opacity var(--transition-speed) ease;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+}
+
+/* (已添加) 标题和 Logo 的 wrapper */
+.hub-header .header-title-wrapper {
+    display: flex;
+    align-items: center; 
+    margin-bottom: 0.5rem;
+}
+
+/* (已修改) 头部 Logo 样式 - 匹配 h1 尺寸 */
+.hub-header .header-logo-img {
+    height: 2.5rem; /* 匹配 h1 字体大小 */
+    width: 2.5rem;  /* 保持 1:1 比例 */
+    object-fit: cover;
+    border-radius: 0.5rem; /* 圆角矩形 */
+    margin-right: 0.8rem; /* Logo 和标题之间的间距 */
+    flex-shrink: 0;
+}
+
+.hub-header h1 { 
+    font-size: 2.5rem; 
+    font-weight: 700; 
+    margin-bottom: 0; 
+}
+.hub-header p { 
+    font-size: 1.1rem; 
+    color: var(--text-secondary-color); 
+    margin-top: 0.5rem; 
+}
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+    .hub-header h1 { color: #111; }
+    .hub-header p { color: #444; }
+}
+
+
+.hub-footer {
+    flex-shrink: 0;
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--text-secondary-color);
+    font-size: 0.8rem;
+    transition: opacity var(--transition-speed) ease;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+    .hub-footer { color: #444; }
+}
+
+
+/* --- 网格布局: 移动端 1x9 (默认) --- */
+.hub-grid {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(9, 1fr);
+    gap: 1rem;
+    overflow: hidden;
+}
+
+/* --- L1 (一级菜单) 卡片样式 --- */
+.hub-card {
+    background-color: var(--card-bg);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    overflow: hidden;
+    cursor: pointer;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    justify-content: center;
+}
+
+.hub-card:hover {
+    transform: translateY(-0.3rem);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hub-card .card-logo-img {
+    width: 3.5rem;
+    height: 3.5rem; 
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-right: 1.8rem; 
+    flex-shrink: 0;
+}
+
+.hub-card .card-logo-icon {
+    font-size: 3.5rem; 
+    color: var(--primary-color); 
+    margin-right: 1.8rem;
+    margin-bottom: 0;
+    transition: color var(--transition-speed) ease;
+    flex-shrink: 0;
+    width: 3.5rem; 
+    text-align: center;
+}
+
+.hub-card .card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+
+.hub-card .card-content h2 {
+    font-size: 1.8rem; 
+    font-weight: 600;
+    margin-bottom: 0;
+    transition: color var(--transition-speed) ease;
+}
+
+.hub-card .card-content p {
+    display: none; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* * =========================================
+ * L2 (二级菜单) 激活样式 
+ * =========================================
+ */
+
+.container.l2-active .hub-header,
+.container.l2-active .hub-footer {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.container.l2-active .hub-card {
+    cursor: default;
+    background-color: var(--card-bg);
+    opacity: 1; 
+}
+.container.l2-active .hub-card:hover {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+/* L2 标题卡片 (可点) */
+.container.l2-active .hub-card[data-type="title"] {
+    color: #ffffff;
+    cursor: pointer;
+    justify-content: flex-start;
+}
+.container.l2-active .hub-card[data-type="title"] .card-logo-icon,
+.container.l2-active .hub-card[data-type="title"] .card-content h2 {
+    color: #ffffff;
+}
+
+/* L2 链接卡片 (可点) */
+.container.l2-active .hub-card[data-type="l2-link"] {
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeInLink 0.3s ease-out forwards;
+    justify-content: flex-start;
+}
+.container.l2-active .hub-card[data-type="l2-link"]:hover {
+    transform: translateY(-0.3rem);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+/* * =========================================
+ * 桌面端布局 (3x3)
+ * =========================================
+ */
+@media (min-width: 769px) {
+
+    .container {
+        padding: 2rem 4rem;
+    }
+
+    /* (已修改) 桌面端 header-logo-img 尺寸调整 */
+    .hub-header .header-logo-img {
+        height: 3rem; /* 匹配桌面端 h1 字体大小 */
+        width: 3rem;
+        margin-right: 1rem;
+        border-radius: 0.6rem;
+    }
+    .hub-header h1 { 
+        font-size: 3rem; /* 桌面端 h1 字体更大 */
+    }
+
+    .hub-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 1.5rem;
+        padding-top: 1rem; 
+        overflow: visible;
+    }
+
+    .hub-card {
+        justify-content: flex-start;
+        padding: 1.5rem;
+    }
+
+    .hub-card:hover {
+        transform: translateY(-0.5rem);
+    }
+
+    .hub-card .card-logo-img {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin-right: 1.5rem;
+    }
+
+    .hub-card .card-logo-icon {
+        font-size: 3.5rem;
+        margin-right: 1.5rem;
+        width: 3.5rem;
+    }
+
+    .hub-card .card-content {
+        flex-grow: 1;
+    }
+
+
+    .hub-card .card-content h2 {
+        font-size: 1.4rem;
+        margin-bottom: 0.25rem; 
+        white-space: normal; 
+        overflow: visible;
+    }
+
+    .hub-card .card-content p {
+        display: block;
+        font-size: 0.9rem; 
+        white-space: normal;
+        overflow: visible;
+    }
+
+    /* L2 桌面端卡片样式调整 */
+    .container.l2-active .hub-card {
+        justify-content: flex-start;
+        padding: 1.5rem;
+    }
+    
+    .container.l2-active .hub-card .card-logo-img {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin-right: 1.5rem;
+    }
+    
+    .container.l2-active .hub-card .card-logo-icon {
+        font-size: 3.5rem;
+        margin-right: 1.5rem;
+        width: 3.5rem;
+    }
+
+    .container.l2-active .hub-card .card-content h2 {
+        font-size: 1.4rem;
+        margin-bottom: 0.25rem;
+        white-space: normal;
+    }
+    
+    .container.l2-active .hub-card[data-type="l2-link"] .card-content p {
+        display: none;
+    }
+
+    .container.l2-active .hub-card[data-type="title"] .card-content p {
+        display: block;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        white-space: normal;
+    }
+}
+
+/* * =========================================
+ * 动画效果定义
+ * =========================================
+ */
+
+@keyframes fadeInLink {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeInL1 {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
